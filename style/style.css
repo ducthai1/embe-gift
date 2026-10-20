@@ -127,10 +127,28 @@ h1 {
 
 .overlay-subtitle {
     font-size: 1.05rem;
+    line-height: 1.6;
     color: rgba(255, 230, 245, 0.85);
-    margin: 0 0 16px 0;
+    max-width: 34rem;
+    margin: 0 auto 12px;
     font-weight: 300;
     letter-spacing: 0.5px;
+}
+
+/* Ẩn chữ màn mở quà tới khi đã tải lời chúc riêng, tránh lời mặc định nháy lên rồi đổi */
+.overlay-content h1,
+.overlay-content .overlay-subtitle {
+    transition: opacity 0.4s ease;
+}
+.overlay-content.text-pending h1,
+.overlay-content.text-pending .overlay-subtitle {
+    opacity: 0;
+    animation: none;
+}
+
+/* Chỉ dòng mời mở quà nhấp nháy, đoạn tâm sự phía trên đứng yên cho dễ đọc */
+.overlay-subtitle:last-of-type {
+    margin-bottom: 16px;
     animation: pulseText 2s ease-in-out infinite;
 }
 
@@ -184,7 +202,7 @@ h1 {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 182, 193, 0.35);
-    border-radius: 40px;
+    border-radius: 22px;
     padding: 10px 22px;
     display: flex;
     align-items: center;
@@ -192,11 +210,15 @@ h1 {
     color: #fff0f7;
     font-size: 0.86rem;
     font-weight: 500;
+    line-height: 1.5;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 105, 180, 0.35);
     z-index: 100000;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     pointer-events: none;
-    max-width: 90vw;
+    /* left: 50% chỉ chừa nửa màn hình cho bề rộng tự co, nên phải tự đặt bề rộng
+       thì câu dài mới không bị bóp thành cột hẹp */
+    width: max-content;
+    max-width: min(90vw, 520px);
     text-align: center;
 }
 

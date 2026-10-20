@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Sửa lời chúc 💌</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style/sua-loi-chuc.css" />
+</head>
+<body>
+    <main class="editor">
+        <header class="editor-head">
+            <h1>Sửa lời chúc 💌</h1>
+            <p>Gõ lời của anh vào các ô bên dưới, bấm <b>Xem trước</b> để thử, ưng rồi thì <b>Lưu lên web</b>.</p>
+        </header>
+
+        <section class="card" id="token-card">
+            <h2>🔑 Kết nối GitHub <span class="badge" id="token-state">chưa kết nối</span></h2>
+            <p class="hint">Chỉ cần làm 1 lần trên mỗi máy. Token chỉ lưu trên máy này, không nằm trong code.</p>
+            <details>
+                <summary>Cách lấy token (1 phút)</summary>
+                <ol>
+                    <li>Mở <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">trang tạo token</a>, đặt tên tuỳ ý, thời hạn tuỳ ý.</li>
+                    <li><b>Repository access</b> → <b>Only select repositories</b> → chọn <b>embe-gift</b>.</li>
+                    <li><b>Permissions → Repository permissions → Contents</b> → chọn <b>Read and write</b>.</li>
+                    <li>Bấm <b>Generate token</b>, copy rồi dán vào ô dưới.</li>
+                </ol>
+            </details>
+            <div class="row">
+                <input type="password" id="token" placeholder="github_pat_..." autocomplete="off" spellcheck="false" />
+                <button type="button" class="btn" id="btn-connect">Kết nối</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>🎁 Màn mở quà</h2>
+            <label>Dòng tiêu đề lớn<input type="text" data-field="welcomeTitle" /></label>
+            <div class="list-label">Các đoạn bên dưới tiêu đề <small>(đoạn cuối sẽ nhấp nháy mời bấm)</small></div>
+            <div class="list" data-list="welcomeLines" data-kind="textarea"></div>
+            <button type="button" class="btn ghost" data-add="welcomeLines">+ Thêm đoạn</button>
+        </section>
+
+        <section class="card">
+            <h2>💐 Lời chào sau khi mở quà</h2>
+            <label>Hiện ở trên cùng màn hình vài giây sau khi mở<textarea rows="2" data-field="openToast"></textarea></label>
+        </section>
+
+        <section class="card">
+            <h2>✨ Chữ bay trong vũ trụ</h2>
+            <p class="hint">Nên ngắn, dưới 30 chữ cái, để đọc được khi bay.</p>
+            <div class="list" data-list="floatingTexts" data-kind="input"></div>
+            <button type="button" class="btn ghost" data-add="floatingTexts">+ Thêm dòng</button>
+        </section>
+
+        <section class="card">
+            <h2>📸 Lời nhắn trên từng ảnh</h2>
+            <p class="hint">Ô thứ 1 ứng với ảnh thứ 1 (xếp theo tên file). Ô để trống thì ảnh đó dùng lời có sẵn; hết ô thì quay lại từ ô đầu.</p>
+            <div class="captions" id="captions"></div>
+            <div class="row wrap">
+                <button type="button" class="btn ghost" id="btn-add-caption">+ Thêm ô</button>
+                <button type="button" class="btn ghost" id="btn-fill-captions" hidden></button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>💌 Lá thư</h2>
+            <label>Tiêu đề thư<input type="text" data-field="letterTitle" /></label>
+            <label>Nội dung thư <small>(xuống dòng 2 lần để tách đoạn)</small><textarea rows="14" data-field="letterBody"></textarea></label>
+            <label>Ký tên<input type="text" data-field="letterSign" /></label>
+        </section>
+
+        <section class="card subtle">
+            <div class="row wrap">
+                <button type="button" class="btn ghost" id="btn-download">Tải file noi-dung.json</button>
+                <button type="button" class="btn ghost danger" id="btn-reset">Về lời mặc định</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="action-bar">
+        <p id="status" role="status"></p>
+        <div class="row">
+            <button type="button" class="btn ghost" id="btn-preview">👀 Xem trước</button>
+            <button type="button" class="btn primary" id="btn-save">💾 Lưu lên web</button>
+        </div>
+    </footer>
+
+    <script type="module" src="./style/sua-loi-chuc.js"></script>
+</body>
+</html>

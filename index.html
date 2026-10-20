@@ -7,14 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- Primary SEO Meta Tags -->
-    <title>Universe & You ❤️ | 3D Cosmic Love Galaxy & Memories</title>
-    <meta name="title" content="Universe & You ❤️ | 3D Cosmic Love Galaxy & Memories" />
+    <title>Tặng Quà Embe</title>
+    <meta name="title" content="Tặng Quà Embe" />
     <meta name="description" content="Explore a romantic 3D cosmic galaxy with thousands of shining star particles forming a crystal heart, floating memories, and a secret love letter." />
     <meta name="keywords" content="Universe and You, 3D Love Galaxy, Romantic Memories, 3D Love Letter, Three.js Galaxy, Love Gift, Romantic Universe" />
-    <meta name="author" content="Universe & You" />
+    <meta name="author" content="Anh của em" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0d0414" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Tặng Quà Embe" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <!-- Favicons & App Icons -->
@@ -27,20 +28,20 @@
     <!-- Open Graph / Facebook / Zalo / Messenger Sharing Meta Tags -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://ducthai1.github.io/embe-gift/" />
-    <meta property="og:title" content="Mở Quà Ngay Nè ❤️ | Universe & You" />
-    <meta property="og:description" content="Chạm vào hộp quà để khám phá vũ trụ ngàn sao và những kỷ niệm ngọt ngào dành riêng cho em." />
+    <meta property="og:title" content="Tặng Quà Embe 💝" />
+    <meta property="og:description" content="20/10 này anh gói cả vũ trụ nhỏ của tụi mình vào một hộp quà. Mở ra đi em, có nhiều điều anh muốn nói lắm 💗" />
     <meta property="og:image" content="https://ducthai1.github.io/embe-gift/style/preview.png" />
     <meta property="og:image:secure_url" content="https://ducthai1.github.io/embe-gift/style/preview.png" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Mở Quà Ngay Nè" />
+    <meta property="og:image:alt" content="Tặng Quà Embe" />
     <meta property="og:locale" content="vi_VN" />
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Mở Quà Ngay Nè ❤️ | Universe & You" />
-    <meta name="twitter:description" content="Chạm vào hộp quà để khám phá vũ trụ ngàn sao dành riêng cho em." />
+    <meta name="twitter:title" content="Tặng Quà Embe 💝" />
+    <meta name="twitter:description" content="20/10 này anh gói cả vũ trụ nhỏ của tụi mình vào một hộp quà. Mở ra đi em 💗" />
     <meta name="twitter:image" content="https://ducthai1.github.io/embe-gift/style/preview.png" />
 
     <!-- Structured Data (Schema.org JSON-LD) -->
@@ -48,7 +49,7 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Universe & You",
+      "name": "Tặng Quà Embe",
       "url": "https://ducthai1.github.io/embe-gift/",
       "description": "A romantic 3D love galaxy featuring thousands of star particles forming a crystal heart core and memory photo album.",
       "inLanguage": "en"
@@ -77,20 +78,21 @@
 
     <!-- Initial Overlay / Gift Screen -->
     <div id="overlay">
-        <div class="overlay-content">
+        <div class="overlay-content text-pending">
             <div class="gift-wrapper">
                 <img src="./style/gift.png" alt="Gift" id="gift-box">
                 <div class="gift-glow"></div>
             </div>
-            <h1>Mở Quà Ngay Nè ❤️</h1>
-            <p class="overlay-subtitle">Chạm vào hộp quà để khám phá vũ trụ dành riêng cho em</p>
+            <h1>Embe mở quà của anh nèeee 💝</h1>
+            <p class="overlay-subtitle">20/10 năm nay anh không biết tặng gì cho xứng với em, nên anh gom hết những khoảnh khắc của tụi mình thành một vũ trụ nhỏ, chỉ dành riêng cho em thôi.</p>
+            <p class="overlay-subtitle">Chạm vào hộp quà đi em, anh có nhiều điều muốn nói lắm 💗</p>
             
             <!-- Loading Indicator & Network Status Hint -->
             <div id="loading-box">
                 <div class="loading-bar-track">
                     <div id="loading-bar-fill"></div>
                 </div>
-                <p id="loading-status-text">Đang tải vũ trụ ngàn sao...</p>
+                <p id="loading-status-text">Anh đang gom từng tấm ảnh của tụi mình lại, đợi anh xíu nha...</p>
             </div>
         </div>
     </div>
@@ -107,7 +109,7 @@
         <!-- Top Center: Guide Hint (Tự ẩn sau 5s) -->
         <div id="guide-hint">
             <span class="sparkle">✨</span>
-            <span>Kéo để xoay vũ trụ • Cuộn phóng to • Chạm ảnh xem kỷ niệm</span>
+            <span>Kéo để xoay vũ trụ của tụi mình • Phóng to để nhìn kỹ • Chạm vào ảnh đọc lời anh nhắn nha</span>
             <span class="sparkle">✨</span>
         </div>
 
@@ -140,8 +142,8 @@
                 <div class="photo-glow"></div>
             </div>
             <div class="photo-caption">
-                <h3 id="modal-caption-title">Khoảnh Khắc Đẹp Nhất</h3>
-                <p id="modal-caption-text">Mỗi giây phút bên em đều là món quà quý giá nhất của anh.</p>
+                <h3 id="modal-caption-title">Khoảnh khắc của tụi mình</h3>
+                <p id="modal-caption-text">Tấm nào có em anh cũng muốn giữ lại thật lâu.</p>
             </div>
         </div>
     </div>
@@ -152,7 +154,7 @@
         <div class="modal-content glass-card letter-card">
             <button class="modal-close" id="letter-close">&times;</button>
             <div class="letter-header">
-                <h2>Gửi Em, Tình Yêu Của Anh 💌</h2>
+                <h2>Gửi embe của anh 💌</h2>
                 <div class="letter-divider"></div>
             </div>
             <div class="letter-body">
@@ -160,7 +162,7 @@
                 <span class="typewriter-cursor">|</span>
             </div>
             <div class="letter-footer">
-                <p class="letter-sign">Mãi yêu em ❤️</p>
+                <p class="letter-sign">Anh của em ❤️</p>
             </div>
         </div>
     </div>

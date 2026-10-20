@@ -1,50 +1,35 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'https://unpkg.com/three@0.136.0/examples/jsm/controls/OrbitControls.js';
+import { captionFor, loadContent } from './tai-noi-dung.js';
 
 /* ========================================================
    1. CONFIGURATION & STATE
    ======================================================== */
-const CONFIG = {
-    // Ngày bắt đầu yêu nhau (Năm, Tháng - 1, Ngày, Giờ, Phút)
-    loveStartDate: new Date('2024-02-14T00:00:00'),
+// Lời chúc đọc từ noi-dung.json (sửa ở trang sua-loi-chuc.html), thiếu thì dùng noi-dung-mac-dinh.js
+const CONTENT = await loadContent();
 
-    // Thư tình bí mật (Hiệu ứng Typewriter)
-    loveLetter: `Gửi người con gái anh yêu nhất trần đời ❤️,
-
-Cảm ơn em vì đã xuất hiện và làm cho thế giới của anh trở nên rực rỡ và ngập tràn sắc màu như dải ngân hà này.
-
-Từng khoảnh khắc bên em, từng nụ cười và ánh mắt của em đều là những điều kỳ diệu nhất mà vũ trụ này ban tặng cho anh. Dù sau này có bao nhiêu năm tháng trôi qua, anh vẫn muốn được cùng em ngắm nhìn những vì sao và nắm chặt tay em đi hết chặng đường phía trước.
-
-Chúc em luôn luôn hạnh phúc, rạng rỡ và mãi là công chúa nhỏ của anh nhé! ✨`,
-
-    // Lời chúc & Caption cho từng bức ảnh
-    photoCaptions: [
-        { title: "Nụ cười của em", text: "Nụ cười của em là ánh sáng rạng rỡ nhất trong vũ trụ của anh." },
-        { title: "Khoảnh khắc ngọt ngào", text: "Mỗi giây phút bên em đều là kỷ niệm anh muốn lưu giữ mãi mãi." },
-        { title: "Ánh mắt biết nói", text: "Chỉ cần nhìn vào mắt em, anh như thấy cả bầu trời bình yên." },
-        { title: "Chuyến đi kỷ niệm", text: "Cùng em đi khắp thế gian là ước muốn lớn nhất của anh." },
-        { title: "Công chúa của anh", text: "Dù ngoài kia có giông bão, về bên anh em luôn được yêu thương." },
-        { title: "Những ngày bình yên", text: "Chẳng cần hoa mỹ, chỉ cần có em ở bên là đủ trọn vẹn." },
-        { title: "Mãi bên nhau nhé", text: "Cảm ơn em vì đã chọn đồng hành cùng anh qua mọi tháng ngày." },
-        { title: "Tình yêu nhiệm màu", text: "Em là món quà tuyệt vời nhất mà cuộc đời đã mang đến cho anh." },
-        { title: "Vũ trụ và Em", text: "Vũ trụ bao la rộng lớn, nhưng tình yêu anh dành cho em còn lớn hơn thế." }
-    ],
-
-    // Ảnh: thả vào thư mục anh/ (tên gì cũng được), xếp theo tên file.
-    // Ảnh thứ N dùng caption thứ N ở trên (thiếu caption thì quay vòng lại từ đầu).
-
-    // Những dòng chữ trắng bay lơ lửng trong vũ trụ 3D
-    floatingTexts: [
-        "I Love You ❤️",
-        "Anh Yêu Em",
-        "Em Là Cả Thế Giới",
-        "Anh Nhớ Em",
-        "Mãi Bên Nhau Nhé 💖",
-        "Chúc Mừng 20/10 💐",
-        "Vũ Trụ Và Em ✨",
-        "My Princess 👑"
-    ]
-};
+// Đổi chữ trên màn mở quà và lá thư theo nội dung đã tải, rồi mới cho hiện ra
+function applyPageText(c) {
+    const overlayContent = document.querySelector('.overlay-content');
+    const loadingBoxEl = document.getElementById('loading-box');
+    if (overlayContent) {
+        const title = overlayContent.querySelector('h1');
+        if (title) title.textContent = c.welcomeTitle;
+        overlayContent.querySelectorAll('.overlay-subtitle').forEach((p) => p.remove());
+        c.welcomeLines.forEach((line) => {
+            const p = document.createElement('p');
+            p.className = 'overlay-subtitle';
+            p.textContent = line;
+            overlayContent.insertBefore(p, loadingBoxEl);
+        });
+        overlayContent.classList.remove('text-pending');
+    }
+    const letterTitle = document.querySelector('.letter-header h2');
+    if (letterTitle) letterTitle.textContent = c.letterTitle;
+    const letterSign = document.querySelector('.letter-sign');
+    if (letterSign) letterSign.textContent = c.letterSign;
+}
+applyPageText(CONTENT);
 
 let isStarted = false;
 let autoRotate = true;
@@ -482,10 +467,10 @@ function showToast(message, icon = "✨", duration = 3200) {
 
 // Bắt sự kiện mạng
 window.addEventListener("offline", () => {
-    showToast("Mất kết nối mạng rồi, em kiểm tra lại nhé! 📶", "⚠️", 4000);
+    showToast("Mạng đang chập chờn rồi embe ơi, kiểm tra giúp anh nha 📶", "⚠️", 4000);
 });
 window.addEventListener("online", () => {
-    showToast("Đã kết nối lại Internet thành công! ✨", "💖", 3000);
+    showToast("Có mạng lại rồi nè, mình xem tiếp nha 💖", "💖", 3000);
 });
 
 // Loading Progress Tracker
@@ -496,32 +481,9 @@ const loadingStatusText = document.getElementById("loading-status-text");
 // Cảnh báo nếu mạng yếu sau 3 giây
 const slowNetworkTimer = setTimeout(() => {
     if (loadingStatusText && (!isStarted)) {
-        loadingStatusText.textContent = "✨ Mạng hơi chậm xíu, vũ trụ đang gom góp yêu thương...";
+        loadingStatusText.textContent = "Mạng hơi chậm xíu, embe đợi anh chút nha 🥺";
     }
 }, 3000);
-
-// Hàm tạo texture dự phòng nếu ảnh bị lỗi mạng
-function createFallbackImageTexture(id) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    
-    // Nền gradient hồng tím
-    const grad = ctx.createLinearGradient(0, 0, 128, 128);
-    grad.addColorStop(0, '#ff1493');
-    grad.addColorStop(1, '#7b2cbf');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 128, 128);
-
-    // Trái tim ở giữa
-    ctx.font = '50px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('💖', 64, 64);
-
-    return new THREE.CanvasTexture(canvas);
-}
 
 // Bo góc ảnh và tạo viền phát sáng
 function createRoundedImageTexture(image) {
@@ -564,12 +526,8 @@ const textureLoader = new THREE.TextureLoader();
 const spriteGroup = new THREE.Group();
 scene.add(spriteGroup);
 
-const photoMaterials = [];
-const photoData = [];
 let loadedCount = 0;
 let totalImages = 0;
-let photoListReady = false;
-let photoLoadStart = 0;
 
 async function loadPhotoList() {
     try {
@@ -588,11 +546,15 @@ function updateLoadingProgress() {
 
     if (loadedCount >= totalImages && loadingStatusText) {
         clearTimeout(slowNetworkTimer);
-        loadingStatusText.textContent = "✨ Vũ trụ đã sẵn sàng! Chạm hộp quà nhé ❤️";
+        loadingStatusText.textContent = "Xong rồi nè, chạm vào hộp quà đi embe ❤️";
     }
 }
 
-function onSingleImageReady(id, src, texture) {
+// Mỗi ảnh có vài bản bay trong vũ trụ (tổng khoảng 200 ô). Ảnh nào tải xong là bay vào ngay,
+// không chốt sổ sau vài giây, để mạng chậm vẫn hiện đủ hết ảnh chứ không chỉ vài tấm tải kịp.
+const TARGET_SPRITES = 200;
+
+function addPhotoSprites(id, src, texture) {
     const mat = new THREE.SpriteMaterial({
         map: texture,
         transparent: true,
@@ -601,56 +563,8 @@ function onSingleImageReady(id, src, texture) {
         opacity: 0.95
     });
 
-    photoMaterials.push(mat);
-    photoData.push({
-        id,
-        src,
-        matIndex: photoMaterials.length - 1
-    });
-
-    loadedCount++;
-    updateLoadingProgress();
-}
-
-loadPhotoList().then((files) => {
-    totalImages = files.length;
-    photoLoadStart = performance.now();
-    photoListReady = true;
-    updateLoadingProgress();
-
-    files.forEach((file, i) => {
-        const id = i + 1;
-        const src = `./anh/${encodeURIComponent(file)}`;
-        textureLoader.load(
-            src,
-            (imgTexture) => onSingleImageReady(id, src, createRoundedImageTexture(imgTexture.image)),
-            undefined,
-            // Xử lý khi ảnh lỗi: Dùng texture fallback để không crash web
-            () => onSingleImageReady(id, src, createFallbackImageTexture(id))
-        );
-    });
-});
-
-const numSprites = 200;
-let spritesInitialized = false;
-
-const checkReady = setInterval(() => {
-    if (!photoListReady || spritesInitialized) return;
-
-    // Chờ tải đủ ảnh; mạng chậm thì sau 4 giây dùng những ảnh đã tải xong
-    const allLoaded = loadedCount >= totalImages;
-    const waitedTooLong = photoMaterials.length > 0 && performance.now() - photoLoadStart > 4000;
-    if (!allLoaded && !waitedTooLong) return;
-
-    spritesInitialized = true;
-    clearInterval(checkReady);
-    if (photoMaterials.length === 0) return;
-
-    for (let i = 0; i < numSprites; i++) {
-        const randomIndex = Math.floor(Math.random() * photoMaterials.length);
-        const mat = photoMaterials[randomIndex];
-        const item = photoData[randomIndex] || photoData[0];
-
+    const copies = Math.max(2, Math.round(TARGET_SPRITES / totalImages));
+    for (let i = 0; i < copies; i++) {
         const sprite = new THREE.Sprite(mat);
         const radius = Math.random() * 26 + 9;
         const theta = Math.random() * Math.PI * 2;
@@ -660,24 +574,41 @@ const checkReady = setInterval(() => {
         const scale = Math.random() * 1.3 + 1.1;
         sprite.scale.set(scale, scale, 1);
 
-        sprite.userData = {
-            photoId: item ? item.id : 1,
-            src: item ? item.src : photoData[0].src,
-            captionIndex: ((item ? item.id : 1) - 1) % CONFIG.photoCaptions.length
-        };
-
+        sprite.userData = { photoId: id, src, captionIndex: id - 1 };
         spriteGroup.add(sprite);
     }
+}
 
-    // Pre-compile toàn bộ Shader & Texture vào GPU trước khi mở quà để triệt tiêu độ trễ
-    renderer.compile(scene, camera);
-}, 80);
+function onPhotoSettled() {
+    loadedCount++;
+    updateLoadingProgress();
+}
+
+loadPhotoList().then((files) => {
+    totalImages = files.length;
+    updateLoadingProgress();
+
+    files.forEach((file, i) => {
+        const id = i + 1;
+        const src = `./anh/${encodeURIComponent(file)}`;
+        textureLoader.load(
+            src,
+            (imgTexture) => {
+                addPhotoSprites(id, src, createRoundedImageTexture(imgTexture.image));
+                onPhotoSettled();
+            },
+            undefined,
+            // Ảnh lỗi thì bỏ qua, không chèn ô thay thế vào vũ trụ
+            onPhotoSettled
+        );
+    });
+});
 
 /* ========================================================
    7. 3D LOVE MESSAGES & FLOATING EMOJIS
    ======================================================== */
 function createTextSprite(message, parameters = {}) {
-    const font = parameters.font || "bold 38px 'Outfit', sans-serif";
+    const font = parameters.font || "bold 38px 'Be Vietnam Pro', 'Outfit', sans-serif";
     const color = parameters.color || "#ffb6c1";
 
     const canvas = document.createElement("canvas");
@@ -701,7 +632,8 @@ function createTextSprite(message, parameters = {}) {
     });
 
     const sprite = new THREE.Sprite(material);
-    sprite.scale.set(6.5, 1.6, 1);
+    // Giữ đúng tỉ lệ khung chữ để câu dài không bị bóp ngang
+    sprite.scale.set(1.6 * canvas.width / canvas.height, 1.6, 1);
     return sprite;
 }
 
@@ -728,7 +660,17 @@ function createEmojiSprite(emoji, scale = 1.8) {
     return sprite;
 }
 
-const messages = CONFIG.floatingTexts;
+// Chờ phông tiếng Việt tải xong (tối đa 1,5 giây) rồi mới vẽ chữ lên canvas
+try {
+    await Promise.race([
+        document.fonts.load("bold 38px 'Be Vietnam Pro'"),
+        new Promise((resolve) => setTimeout(resolve, 1500))
+    ]);
+} catch {
+    // không tải được phông thì vẽ bằng phông dự phòng
+}
+
+const messages = CONTENT.floatingTexts;
 
 messages.forEach((msg) => {
     const sprite = createTextSprite(msg, { color: "#ffffff" });
@@ -767,11 +709,11 @@ const photoClose = document.getElementById("photo-close");
 function openPhotoModal(sprite) {
     if (!sprite || !sprite.userData || !sprite.userData.src) return;
     const { src, captionIndex } = sprite.userData;
-    const captionInfo = CONFIG.photoCaptions[captionIndex] || CONFIG.photoCaptions[0];
+    const captionInfo = captionFor(CONTENT, captionIndex);
 
     modalImg.src = src;
     modalTitle.textContent = captionInfo.title;
-    modalText.textContent = `"${captionInfo.text}"`;
+    modalText.textContent = captionInfo.text ? `"${captionInfo.text}"` : "";
     photoModal.classList.remove("hidden");
 }
 
@@ -931,7 +873,7 @@ function startTypewriter() {
     isTypewriting = true;
     typewriterTextEl.textContent = "";
     let i = 0;
-    const text = CONFIG.loveLetter;
+    const text = CONTENT.letterBody;
 
     function typeChar() {
         if (i < text.length) {
@@ -994,7 +936,7 @@ overlay.addEventListener("click", (e) => {
     audio.play().then(() => {
         if (btnMusic) btnMusic.classList.add("playing");
     }).catch(() => {
-        showToast("Chạm nút 🎵 ở góc phải để bật nhạc nhé em!", "🎵", 4000);
+        showToast("Bấm nút 🎵 ở góc phải để nghe nhạc cùng anh nha embe!", "🎵", 4000);
     });
 
     overlay.classList.add("hidden");
@@ -1010,6 +952,11 @@ overlay.addEventListener("click", (e) => {
     setTimeout(() => {
         if (guideHint) guideHint.classList.add("fade-out");
     }, 5000);
+
+    // Lời chào hiện sau khi dòng hướng dẫn đã ẩn, để hai thứ không đè lên nhau
+    if (CONTENT.openToast.trim()) {
+        setTimeout(() => showToast(CONTENT.openToast, "💐", 7000), 5600);
+    }
 });
 
 /* ========================================================

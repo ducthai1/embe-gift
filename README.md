@@ -19,15 +19,15 @@ Lưu ý về ảnh:
 - Mỗi file dưới 25MB (giới hạn upload của GitHub), mỗi lần upload tối đa 100 file.
 - Ô ảnh trong vũ trụ cắt lấy phần vuông ở giữa; chạm vào ô sẽ thấy ảnh đầy đủ.
 
-## Sửa chữ, thư và nhạc
+## Sửa lời chúc: trang có sẵn ô nhập
 
-| Muốn đổi | Sửa ở |
-| --- | --- |
-| Lời hiện ra khi chạm vào ảnh (ảnh thứ N dùng lời thứ N) | `style/script.js` → `CONFIG.photoCaptions` |
-| Các dòng chữ bay trong vũ trụ (nên thêm tên em) | `style/script.js` → `CONFIG.floatingTexts` |
-| Lá thư khi bấm 💌 | `style/script.js` → `CONFIG.loveLetter` |
-| Chữ màn mở quà, tiêu đề thư | `index.html` |
-| Nhạc nền | chép bài mới đè lên `style/hihi.mp3` (giữ nguyên tên) |
+Mở https://ducthai1.github.io/embe-gift/sua-loi-chuc.html, gõ lời vào các ô (màn mở quà, lời chào, chữ bay, lời trên từng ảnh kèm hình nhỏ, lá thư), bấm **Xem trước** để thử, rồi **Lưu lên web**.
+
+- Lần đầu cần dán một GitHub token (có hướng dẫn ngay trên trang). Token chỉ lưu trên máy đó.
+- Lưu xong khoảng 1–2 phút trang tự cập nhật. Lời được ghi vào file `noi-dung.json`.
+- Lời mặc định nằm ở `style/noi-dung-mac-dinh.js`; ô nào để trống thì dùng lời mặc định.
+
+Nhạc nền: chép bài mới đè lên `style/hihi.mp3` (giữ nguyên tên).
 
 ## Bật trang web (làm 1 lần)
 

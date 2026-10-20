@@ -33,7 +33,8 @@ jobs:
       # xoá GPS, rồi quét lại để trang web biết có những ảnh nào.
       - run: |
           mkdir _site
-          cp -r index.html style favicon_io anh _site/
+          cp -r index.html sua-loi-chuc.html style favicon_io anh _site/
+          if [ -f noi-dung.json ]; then cp noi-dung.json _site/; fi
           node scripts/nen-anh.mjs _site/anh
           node scripts/tao-danh-sach-anh.mjs _site/anh
 

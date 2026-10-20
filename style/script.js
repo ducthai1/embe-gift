@@ -582,6 +582,51 @@ function updateLoadingProgress() {
 // Mỗi ảnh có vài bản bay trong vũ trụ (tổng khoảng 200 ô). Ảnh nào tải xong là bay vào ngay,
 // không chốt sổ sau vài giây, để mạng chậm vẫn hiện đủ hết ảnh chứ không chỉ vài tấm tải kịp.
 const TARGET_SPRITES = 200;
+let copiesPerPhoto = 2;
+
+// Chỗ đặt ảnh: chia đều các ô trên mặt cầu (xoắn Fibonacci, bán kính 9–35 ngẫu nhiên) rồi bốc ngẫu nhiên,
+// mỗi lần mở trang một kiểu. Ảnh tên gần nhau thường chụp liền nhau, cùng bối cảnh, nên mỗi bản ảnh thử
+// vài ô và lấy ô có góc nhìn xa nhất so với các ảnh chụp gần nó và các bản của chính nó.
+// Mô phỏng 60 ảnh × 3 bản: ô kế bên là ảnh chụp gần nhau giảm từ 20% (rải ngẫu nhiên thuần) xuống dưới 1%.
+const SIMILAR_WITHIN = 6;
+const SLOT_CANDIDATES = 16;
+let freeSlots = [];
+const placedPhotos = [];
+
+function buildSlots(count) {
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    const slots = [];
+    for (let i = 0; i < count; i++) {
+        const y = 1 - (2 * (i + 0.5)) / count;
+        const ring = Math.sqrt(1 - y * y);
+        const theta = golden * i;
+        const radius = Math.random() * 26 + 9;
+        slots.push(new THREE.Vector3(Math.cos(theta) * ring, y, Math.sin(theta) * ring).multiplyScalar(radius));
+    }
+    return slots;
+}
+
+function takeSlot(photoIndex) {
+    if (freeSlots.length === 0) freeSlots = buildSlots(TARGET_SPRITES);
+    let best = 0;
+    let bestScore = -1;
+    for (let t = 0; t < Math.min(SLOT_CANDIDATES, freeSlots.length); t++) {
+        const k = Math.floor(Math.random() * freeSlots.length);
+        let nearest = Infinity;
+        for (const placed of placedPhotos) {
+            if (Math.abs(placed.index - photoIndex) <= SIMILAR_WITHIN) {
+                nearest = Math.min(nearest, placed.pos.angleTo(freeSlots[k]));
+            }
+        }
+        if (nearest > bestScore) {
+            bestScore = nearest;
+            best = k;
+        }
+    }
+    const [pos] = freeSlots.splice(best, 1);
+    placedPhotos.push({ index: photoIndex, pos });
+    return pos;
+}
 
 function addPhotoSprites(id, src, texture) {
     const mat = new THREE.SpriteMaterial({
@@ -592,13 +637,9 @@ function addPhotoSprites(id, src, texture) {
         opacity: 0.95
     });
 
-    const copies = Math.max(2, Math.round(TARGET_SPRITES / totalImages));
-    for (let i = 0; i < copies; i++) {
+    for (let i = 0; i < copiesPerPhoto; i++) {
         const sprite = new THREE.Sprite(mat);
-        const radius = Math.random() * 26 + 9;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        sprite.position.setFromSphericalCoords(radius, phi, theta);
+        sprite.position.copy(takeSlot(id - 1));
 
         const scale = Math.random() * 1.3 + 1.1;
         sprite.scale.set(scale, scale, 1);
@@ -616,6 +657,8 @@ function onPhotoSettled() {
 loadPhotoList().then((files) => {
     totalImages = files.length;
     photoListLoaded = true;
+    copiesPerPhoto = Math.max(2, Math.round(TARGET_SPRITES / Math.max(1, totalImages)));
+    freeSlots = buildSlots(copiesPerPhoto * totalImages);
     updateLoadingProgress();
 
     files.forEach((file, i) => {

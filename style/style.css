@@ -100,6 +100,54 @@ canvas:not(#fxCanvas) {
     filter: drop-shadow(0 0 45px rgba(255, 150, 220, 0.9));
 }
 
+/* Đang tải ảnh: hộp quà mờ đi, không phản hồi khi rê chuột, dòng mời chạm tắt sáng */
+#overlay.is-loading {
+    cursor: progress;
+}
+#overlay.is-loading #gift-box,
+#overlay.is-loading .gift-wrapper:hover #gift-box {
+    transform: none;
+    opacity: 0.6;
+    filter: grayscale(0.5) drop-shadow(0 0 16px rgba(255, 105, 180, 0.3));
+}
+#overlay.is-loading .gift-glow {
+    opacity: 0.25;
+}
+#overlay.is-loading .overlay-subtitle:last-of-type {
+    animation: none;
+    opacity: 0.45;
+}
+
+/* Chạm khi chưa tải xong: lắc nhẹ để biết là đang đợi */
+#overlay.nudge #gift-box {
+    animation: giftNudge 0.45s ease-in-out, floatGift 3s ease-in-out 0.45s infinite;
+}
+
+/* Vừa tải xong: hộp quà sáng lên và nảy một nhịp mời chạm */
+#overlay.just-ready #gift-box {
+    animation: giftReady 0.9s cubic-bezier(0.34, 1.56, 0.64, 1), floatGift 3s ease-in-out 0.9s infinite;
+}
+#overlay #gift-box,
+#overlay .gift-glow,
+#overlay .overlay-subtitle {
+    transition: opacity 0.5s ease, filter 0.5s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes giftNudge {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-8px) rotate(-4deg); }
+    40% { transform: translateX(8px) rotate(4deg); }
+    60% { transform: translateX(-5px) rotate(-2deg); }
+    80% { transform: translateX(5px) rotate(2deg); }
+}
+
+@keyframes giftReady {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.18) rotate(-5deg); }
+    70% { transform: scale(0.96) rotate(3deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
 .gift-glow {
     position: absolute;
     top: 50%;

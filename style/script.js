@@ -478,12 +478,31 @@ const loadingBox = document.getElementById("loading-box");
 const loadingBarFill = document.getElementById("loading-bar-fill");
 const loadingStatusText = document.getElementById("loading-status-text");
 
-// Cảnh báo nếu mạng yếu sau 3 giây
+// Hộp quà khoá (lớp is-loading trong index.html) tới khi tải xong hết ảnh.
+// Một ảnh treo mãi không về thì sau 45 giây vẫn mở khoá, ảnh còn lại tải xong sẽ tự bay vào sau.
+let giftReady = false;
+let isSlowNetwork = false;
+const GIFT_UNLOCK_MAX_MS = 45000;
+
+// Mạng yếu thì sau 3 giây đổi lời nhắn chờ
 const slowNetworkTimer = setTimeout(() => {
-    if (loadingStatusText && (!isStarted)) {
-        loadingStatusText.textContent = "Mạng hơi chậm xíu, embe đợi anh chút nha 🥺";
-    }
+    isSlowNetwork = true;
+    updateLoadingProgress();
 }, 3000);
+const giftUnlockTimer = setTimeout(() => markGiftReady(), GIFT_UNLOCK_MAX_MS);
+
+function markGiftReady() {
+    if (giftReady) return;
+    giftReady = true;
+    clearTimeout(slowNetworkTimer);
+    clearTimeout(giftUnlockTimer);
+    // Lấy thẳng từ DOM: hàm này có thể chạy trước khi dòng khai báo hằng overlay bên dưới được chạy tới
+    const overlayEl = document.getElementById("overlay");
+    overlayEl.classList.remove("is-loading", "nudge");
+    overlayEl.classList.add("just-ready");
+    if (loadingBarFill) loadingBarFill.style.width = "100%";
+    if (loadingStatusText) loadingStatusText.textContent = "Xong rồi nè, chạm vào hộp quà đi embe ❤️";
+}
 
 // Bo góc ảnh và tạo viền phát sáng
 function createRoundedImageTexture(image) {
@@ -528,6 +547,7 @@ scene.add(spriteGroup);
 
 let loadedCount = 0;
 let totalImages = 0;
+let photoListLoaded = false;
 
 async function loadPhotoList() {
     try {
@@ -541,12 +561,21 @@ async function loadPhotoList() {
 }
 
 function updateLoadingProgress() {
-    const pct = totalImages ? Math.min(100, Math.round((loadedCount / totalImages) * 100)) : 100;
-    if (loadingBarFill) loadingBarFill.style.width = `${pct}%`;
+    if (giftReady) return;
+    if (!photoListLoaded) {
+        if (isSlowNetwork && loadingStatusText) loadingStatusText.textContent = "Mạng hơi chậm xíu, embe đợi anh chút nha 🥺";
+        return;
+    }
+    if (loadedCount >= totalImages) {
+        markGiftReady();
+        return;
+    }
 
-    if (loadedCount >= totalImages && loadingStatusText) {
-        clearTimeout(slowNetworkTimer);
-        loadingStatusText.textContent = "Xong rồi nè, chạm vào hộp quà đi embe ❤️";
+    const pct = Math.min(100, Math.round((loadedCount / totalImages) * 100));
+    if (loadingBarFill) loadingBarFill.style.width = `${pct}%`;
+    if (loadingStatusText) {
+        const lead = isSlowNetwork ? "Mạng hơi chậm xíu, embe đợi anh chút nha 🥺" : "Anh đang gom ảnh của tụi mình lại nè";
+        loadingStatusText.textContent = `${lead} (${loadedCount}/${totalImages})`;
     }
 }
 
@@ -586,6 +615,7 @@ function onPhotoSettled() {
 
 loadPhotoList().then((files) => {
     totalImages = files.length;
+    photoListLoaded = true;
     updateLoadingProgress();
 
     files.forEach((file, i) => {
@@ -931,6 +961,14 @@ camera.position.set(0, 4, 40);
 
 // Mở Quà
 overlay.addEventListener("click", (e) => {
+    // Chưa tải xong ảnh thì chưa cho mở: lắc nhẹ hộp quà để em biết là đang đợi
+    if (!giftReady) {
+        overlay.classList.remove("nudge");
+        void overlay.offsetWidth;
+        overlay.classList.add("nudge");
+        return;
+    }
+
     triggerHeartFireworks(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2);
 
     audio.play().then(() => {

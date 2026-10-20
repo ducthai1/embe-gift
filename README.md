@@ -15,9 +15,9 @@ Tên file gì cũng được, không cần đánh số. Ảnh hiện theo thứ 
 3. Chờ khoảng 1 phút để GitHub Actions tự cập nhật trang (xem ở tab **Actions**), rồi mở link.
 
 Lưu ý về ảnh:
-- Dùng JPG, PNG hoặc WebP. Ảnh **HEIC** của iPhone trình duyệt không mở được, hãy đổi sang JPG trước.
-- Mỗi ảnh nên rộng khoảng 1080px và dưới 300KB để mở nhanh trên điện thoại. Ô ảnh trong vũ trụ cắt lấy phần vuông ở giữa.
-- Khoảng 10–30 ảnh là đẹp.
+- Up thẳng ảnh gốc từ điện thoại được, kể cả **HEIC** của iPhone. Mỗi lần deploy, bản đưa lên web tự thu nhỏ (cạnh dài 1600px), đổi HEIC sang JPG và xoá vị trí GPS trong ảnh. Ảnh gốc trong repo giữ nguyên.
+- Mỗi file dưới 25MB (giới hạn upload của GitHub), mỗi lần upload tối đa 100 file.
+- Ô ảnh trong vũ trụ cắt lấy phần vuông ở giữa; chạm vào ô sẽ thấy ảnh đầy đủ.
 
 ## Sửa chữ, thư và nhạc
 

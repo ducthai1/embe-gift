@@ -23,14 +23,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Quét thư mục anh/ để trang web biết có những ảnh nào
-      - run: node scripts/tao-danh-sach-anh.mjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install --no-save --no-package-lock --no-audit --no-fund sharp@0.35 heic-convert@2
+
+      # Chỉ đưa lên web các file của trang. Ảnh trong anh/ được thu nhỏ, HEIC đổi sang JPG,
+      # xoá GPS, rồi quét lại để trang web biết có những ảnh nào.
+      - run: |
+          mkdir _site
+          cp -r index.html style favicon_io anh _site/
+          node scripts/nen-anh.mjs _site/anh
+          node scripts/tao-danh-sach-anh.mjs _site/anh
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - id: deployment
         uses: actions/deploy-pages@v4

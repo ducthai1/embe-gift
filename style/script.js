@@ -1,5 +1,6 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'https://unpkg.com/three@0.136.0/examples/jsm/controls/OrbitControls.js';
+// three.js r136 để ngay trong repo: không phụ thuộc CDN (mạng chặn unpkg là cả trang đứng) và không cần import map
+import * as THREE from './vendor/three.module.js';
+import { OrbitControls } from './vendor/OrbitControls.js';
 import { captionFor, loadContent } from './tai-noi-dung.js';
 
 /* ========================================================
@@ -1039,6 +1040,9 @@ overlay.addEventListener("click", (e) => {
         setTimeout(() => showToast(CONTENT.openToast, "💐", 7000), 5600);
     }
 });
+
+// Báo cho đoạn canh lỗi trong index.html biết trang đã chạy được tới lúc bấm mở quà
+window.__giftBooted = true;
 
 /* ========================================================
    13. SINGLE UNIFIED SMOOTH RENDER LOOP (60FPS+ LOCKED)

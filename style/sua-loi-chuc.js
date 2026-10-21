@@ -1,7 +1,7 @@
 // Trang sửa lời chúc: đọc noi-dung.json, cho sửa trong các ô, rồi ghi lại vào repo qua GitHub API.
 // Mỗi lần ghi là một commit, GitHub Actions tự deploy lại trang sau khoảng 1–2 phút.
 import { DEFAULT_CONTENT } from './noi-dung-mac-dinh.js';
-import { loadContent, mergeContent, PREVIEW_KEY } from './tai-noi-dung.js';
+import { cloneData, loadContent, mergeContent, PREVIEW_KEY } from './tai-noi-dung.js';
 
 const REPO = 'ducthai1/embe-gift';
 const BRANCH = 'main';
@@ -13,7 +13,7 @@ const $ = (sel) => document.querySelector(sel);
 const statusEl = $('#status');
 const tokenInput = $('#token');
 
-let content = structuredClone(DEFAULT_CONTENT);
+let content = cloneData(DEFAULT_CONTENT);
 let photos = [];
 let dirty = false;
 
@@ -202,7 +202,7 @@ $('#btn-fill-captions').onclick = () => {
 
 $('#btn-reset').onclick = () => {
     if (!confirm('Đưa tất cả về lời mặc định? Những gì đang gõ sẽ mất.')) return;
-    content = structuredClone(DEFAULT_CONTENT);
+    content = cloneData(DEFAULT_CONTENT);
     renderAll();
     markDirty();
 };

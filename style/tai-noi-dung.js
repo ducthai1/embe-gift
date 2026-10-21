@@ -4,10 +4,13 @@ export const PREVIEW_KEY = 'embe-gift-xem-truoc';
 
 const isText = (s) => typeof s === 'string' && s.trim() !== '';
 
+// Sao chép sâu kiểu JSON thay cho structuredClone (Safari dưới 15.4 không có)
+export const cloneData = (data) => JSON.parse(JSON.stringify(data));
+
 // Gộp noi-dung.json với mặc định: mục nào thiếu hoặc sai kiểu thì dùng mặc định.
 // Lời nhắn ảnh giữ nguyên vị trí (ô trống vẫn giữ chỗ) vì ảnh thứ N ứng với ô thứ N.
 export function mergeContent(data) {
-    const out = structuredClone(DEFAULT_CONTENT);
+    const out = cloneData(DEFAULT_CONTENT);
     if (!data || typeof data !== 'object') return out;
 
     for (const key of Object.keys(DEFAULT_CONTENT)) {

@@ -63,13 +63,6 @@
     
     <link rel="stylesheet" href="./style/style.css">
     
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.136.0/build/three.module.js"
-      }
-    }
-    </script>
 </head>
 
 <body>
@@ -173,6 +166,40 @@
     </audio>
 
     <!-- Three.js App -->
+    <!-- Trang không khởi động được (trình duyệt cũ, mạng chặn...) thì báo lý do lên màn hình thay vì đứng chờ mãi.
+         Viết kiểu cũ (không module) để chạy được cả khi phần chính không chạy. -->
+    <script>
+    (function () {
+        var errors = [];
+        window.addEventListener('error', function (e) {
+            var t = e.target;
+            if (t && t !== window && (t.src || t.href)) errors.push('không tải được ' + (t.src || t.href));
+            else if (e.message) errors.push(e.message);
+        }, true);
+        window.addEventListener('unhandledrejection', function (e) {
+            var r = e.reason;
+            errors.push(String((r && r.message) || r));
+        });
+
+        function say(text) {
+            if (window.__giftBooted) return;
+            var content = document.querySelector('.overlay-content');
+            if (content) content.classList.remove('text-pending');
+            var el = document.getElementById('loading-status-text');
+            if (el) el.textContent = text;
+        }
+
+        setTimeout(function () {
+            if (errors.length) say('Trang gặp lỗi 😢 ' + errors.join(' | '));
+            else say('Mạng hơi chậm xíu, embe đợi anh thêm chút nha 🥺');
+        }, 12000);
+        setTimeout(function () {
+            say('Trang chưa chạy được trên máy này 😢 Thử mở bằng Chrome hoặc Safari bản mới nhé.'
+                + (errors.length ? ' Lỗi: ' + errors.join(' | ') : ' (không có lỗi nào, có thể mạng quá chậm)')
+                + ' — ' + navigator.userAgent);
+        }, 40000);
+    })();
+    </script>
     <script type="module" src="./style/script.js"></script>
 </body>
 

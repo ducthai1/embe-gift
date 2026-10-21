@@ -2,6 +2,7 @@
 import * as THREE from './vendor/three.module.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { captionFor, loadContent } from './tai-noi-dung.js';
+import { addCloudPhoto, addCloudTexts } from './che-do-2d.js';
 
 /* ========================================================
    1. CONFIGURATION & STATE
@@ -44,28 +45,51 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
 camera.position.set(0, 4, 22);
 
-const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: true,
-    powerPreference: "high-performance",
-    precision: "mediump"
-});
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-document.body.appendChild(renderer.domElement);
+// Thử tạo WebGL từ cấu hình đẹp nhất xuống nhẹ nhất. Có máy (vd Chrome trên một số Mac) báo
+// "Error creating WebGL context" với khử răng cưa / GPU hiệu năng cao nhưng vẫn chạy được cấu hình nhẹ.
+function createRenderer() {
+    const attempts = [
+        { antialias: true, alpha: true, powerPreference: "high-performance", precision: "mediump" },
+        { antialias: false, alpha: true, powerPreference: "default" },
+        { antialias: false, alpha: true, powerPreference: "low-power", precision: "lowp" },
+    ];
+    for (const options of attempts) {
+        try {
+            return new THREE.WebGLRenderer(options);
+        } catch (err) {
+            console.warn("Không tạo được WebGL với", options, err);
+        }
+    }
+    return null;
+}
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.06;
-controls.enablePan = false;
-controls.minDistance = 6;
-controls.maxDistance = 60;
+const renderer = createRenderer();
+// Không có WebGL thì chạy chế độ 2D (style/che-do-2d.js): ảnh, trái tim, chữ bay bằng HTML
+const HAS_WEBGL = renderer !== null;
+if (HAS_WEBGL) {
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    document.body.appendChild(renderer.domElement);
+} else {
+    document.body.classList.add("no-webgl");
+}
+
+const controls = HAS_WEBGL ? new OrbitControls(camera, renderer.domElement) : null;
+if (controls) {
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.enablePan = false;
+    controls.minDistance = 6;
+    controls.maxDistance = 60;
+}
 
 window.addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    if (renderer) {
+        renderer.setSize(innerWidth, innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    }
     resizeFxCanvas();
 });
 
@@ -630,6 +654,12 @@ function takeSlot(photoIndex) {
 }
 
 function addPhotoSprites(id, src, texture) {
+    if (!HAS_WEBGL) {
+        const direction = takeSlot(id - 1).clone().normalize();
+        addCloudPhoto(src, direction, () => openPhotoModal({ userData: { src, captionIndex: id - 1 } }));
+        return;
+    }
+
     const mat = new THREE.SpriteMaterial({
         map: texture,
         transparent: true,
@@ -658,7 +688,8 @@ function onPhotoSettled() {
 loadPhotoList().then((files) => {
     totalImages = files.length;
     photoListLoaded = true;
-    copiesPerPhoto = Math.max(2, Math.round(TARGET_SPRITES / Math.max(1, totalImages)));
+    // Bản 2D vẽ bằng HTML nên mỗi ảnh chỉ 1 ô cho nhẹ máy
+    copiesPerPhoto = HAS_WEBGL ? Math.max(2, Math.round(TARGET_SPRITES / Math.max(1, totalImages))) : 1;
     freeSlots = buildSlots(copiesPerPhoto * totalImages);
     updateLoadingProgress();
 
@@ -746,7 +777,8 @@ try {
 
 const messages = CONTENT.floatingTexts;
 
-messages.forEach((msg) => {
+if (!HAS_WEBGL) addCloudTexts(messages);
+else messages.forEach((msg) => {
     const sprite = createTextSprite(msg, { color: "#ffffff" });
     sprite.position.set(
         Math.random() * 36 - 18,
@@ -1022,6 +1054,7 @@ overlay.addEventListener("click", (e) => {
     });
 
     overlay.classList.add("hidden");
+    document.body.classList.add("gift-opened");
     if (uiContainer) uiContainer.classList.remove("hidden");
     isStarted = true;
     isIntroAnimating = false;
@@ -1049,7 +1082,7 @@ window.__giftBooted = true;
    ======================================================== */
 const clock = new THREE.Clock();
 
-renderer.setAnimationLoop(() => {
+function renderFrame() {
     const delta = Math.min(clock.getDelta(), 0.05);
     const elapsedTime = clock.getElapsedTime();
 
@@ -1073,4 +1106,15 @@ renderer.setAnimationLoop(() => {
 
     // Gộp render FX hạt vào cùng 1 vòng lặp để đồng bộ tuyệt đối
     renderFxOnFrame();
-});
+}
+
+if (HAS_WEBGL) {
+    renderer.setAnimationLoop(renderFrame);
+} else {
+    // Bản 2D: chỉ còn lớp pháo hoa / tia sáng theo ngón tay vẽ bằng canvas 2D
+    const loop2d = () => {
+        renderFxOnFrame();
+        requestAnimationFrame(loop2d);
+    };
+    requestAnimationFrame(loop2d);
+}
